@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 
 	"gorm.io/driver/postgres"
@@ -17,4 +18,5 @@ func ConnectDB() {
 	}
 
 	DB = db
+	fmt.Println("DB connection successful")
 }
