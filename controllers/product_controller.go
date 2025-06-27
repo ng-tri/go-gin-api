@@ -1,18 +1,16 @@
 package controllers
 
 import (
+	"go_gin_api/config"
 	"go_gin_api/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-var products = []models.Product{
-	{ID: 1, Name: "iPhone", Price: 25000000},
-	{ID: 2, Name: "MacBook", Price: 45000000},
-}
-
 func GetProducts(c *gin.Context) {
+	var products []models.Product
+	config.DB.Find(&products)
 	c.JSON(http.StatusOK, products)
 }
 
@@ -23,7 +21,10 @@ func CreateProduct(c *gin.Context) {
 		return
 	}
 
-	newProduct.ID = len(products) + 1
-	products = append(products, newProduct)
+	if err := config.DB.Create(&newProduct).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot create"})
+		return
+	}
+
 	c.JSON(http.StatusOK, newProduct)
 }
