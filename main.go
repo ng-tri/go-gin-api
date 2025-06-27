@@ -1,14 +1,15 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "go_gin_api/routes"
+	"go_gin_api/routes"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-    r := gin.Default()
+	r := gin.Default()
 
-    routes.RegisterProductRoutes(r)
+	routes.RegisterProductRoutes(r)
 
-    r.Run(":8080")
+	r.Run(":8080")
 }
