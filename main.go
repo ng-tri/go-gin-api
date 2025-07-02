@@ -2,6 +2,7 @@ package main
 
 import (
 	"go_gin_api/config"
+	"go_gin_api/middlewares"
 	"go_gin_api/models"
 	"go_gin_api/routes"
 
@@ -10,10 +11,10 @@ import (
 
 func main() {
 	config.ConnectDB()
-
 	config.DB.AutoMigrate(&models.Product{})
 
 	r := gin.Default()
+	r.Use(middlewares.Logger())
 
 	routes.RegisterProductRoutes(r)
 
