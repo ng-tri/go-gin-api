@@ -16,6 +16,7 @@ func main() {
 	r := gin.Default()
 	r.Use(middlewares.Logger())
 
+	routes.RegisterAuthRoutes(r) // ✅ thêm login
 	routes.RegisterProductRoutes(r)
 
 	r.Run(":8080")
