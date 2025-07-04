@@ -12,11 +12,14 @@ import (
 func main() {
 	config.ConnectDB()
 	config.DB.AutoMigrate(&models.Product{})
+	gin.SetMode(gin.ReleaseMode)
 
-	r := gin.Default()
-	r.Use(middlewares.Logger())
+	r := gin.New()
+	r.Use(gin.Logger(), gin.Recovery())
+	r.Use(middlewares.LoggerMiddleware())
+	r.SetTrustedProxies([]string{"127.0.0.1"})
 
-	routes.RegisterAuthRoutes(r) // ✅ thêm login
+	routes.RegisterAuthRoutes(r)
 	routes.RegisterProductRoutes(r)
 
 	r.Run(":8080")
