@@ -17,6 +17,8 @@ func RegisterProductRoutes(r *gin.Engine) {
 
 	protected := r.Group("/products")
 	protected.Use(middlewares.JWTMiddleware())
+
 	protected.GET("", controllers.GetProducts)
 	protected.POST("", controllers.CreateProduct)
+	protected.DELETE("/:id", controllers.DeleteProduct)
 }
