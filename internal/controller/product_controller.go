@@ -1,8 +1,8 @@
-package controllers
+package controller
 
 import (
-	"go-gin-api/src/config"
-	"go-gin-api/src/models"
+	"go-gin-api/internal/database"
+	"go-gin-api/internal/model"
 	"log"
 	"net/http"
 	"strconv"
@@ -12,15 +12,15 @@ import (
 )
 
 func GetProducts(c *gin.Context) {
-	var products []models.Product
-	config.DB.Find(&products)
+	var products []model.Product
+	database.DB.Find(&products)
 	c.JSON(http.StatusOK, products)
 }
 
 func GetProduct(c *gin.Context) {
 	id := c.Param("id")
-	var product models.Product
-	if err := config.DB.First(&product, id).Error; err != nil {
+	var product model.Product
+	if err := database.DB.First(&product, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Không tìm thấy sản phẩm"})
 		return
 	}
@@ -28,13 +28,13 @@ func GetProduct(c *gin.Context) {
 }
 
 func CreateProduct(c *gin.Context) {
-	var newProduct models.Product
+	var newProduct model.Product
 	if err := c.ShouldBindJSON(&newProduct); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := config.DB.Create(&newProduct).Error; err != nil {
+	if err := database.DB.Create(&newProduct).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot create"})
 		return
 	}
@@ -44,13 +44,13 @@ func CreateProduct(c *gin.Context) {
 
 func UpdateProduct(c *gin.Context) {
 	id := c.Param("id")
-	var product models.Product
-	if err := config.DB.First(&product, id).Error; err != nil {
+	var product model.Product
+	if err := database.DB.First(&product, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Sản phẩm không tồn tại"})
 		return
 	}
 
-	var updateData models.Product
+	var updateData model.Product
 	if err := c.ShouldBindJSON(&updateData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -58,7 +58,7 @@ func UpdateProduct(c *gin.Context) {
 
 	product.Name = updateData.Name
 	product.Price = updateData.Price
-	config.DB.Save(&product)
+	database.DB.Save(&product)
 
 	c.JSON(http.StatusOK, product)
 }
@@ -73,8 +73,8 @@ func DeleteProduct(c *gin.Context) {
 		return
 	}
 
-	var product models.Product
-	result := config.DB.First(&product, id)
+	var product model.Product
+	result := database.DB.First(&product, id)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
@@ -84,7 +84,7 @@ func DeleteProduct(c *gin.Context) {
 		return
 	}
 
-	if err := config.DB.Delete(&product).Error; err != nil {
+	if err := database.DB.Delete(&product).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
 		return
 	}
