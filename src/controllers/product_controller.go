@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"fmt"
-	"go-gin-api/config"
-	"go-gin-api/models"
+	"go-gin-api/src/config"
+	"go-gin-api/src/models"
 	"log"
 	"net/http"
 	"os"

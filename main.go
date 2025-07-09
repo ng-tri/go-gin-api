@@ -1,10 +1,10 @@
 package main
 
 import (
-	"go-gin-api/config"
-	"go-gin-api/middlewares"
-	"go-gin-api/models"
-	"go-gin-api/routes"
+	"go-gin-api/src/config"
+	"go-gin-api/src/middlewares"
+	"go-gin-api/src/models"
+	"go-gin-api/src/routes"
 
 	"github.com/gin-gonic/gin"
 )
