@@ -1,12 +1,10 @@
 package controllers
 
 import (
-	"fmt"
 	"go-gin-api/src/config"
 	"go-gin-api/src/models"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +15,16 @@ func GetProducts(c *gin.Context) {
 	var products []models.Product
 	config.DB.Find(&products)
 	c.JSON(http.StatusOK, products)
+}
+
+func GetProduct(c *gin.Context) {
+	id := c.Param("id")
+	var product models.Product
+	if err := config.DB.First(&product, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Không tìm thấy sản phẩm"})
+		return
+	}
+	c.JSON(http.StatusOK, product)
 }
 
 func CreateProduct(c *gin.Context) {
@@ -34,13 +42,32 @@ func CreateProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, newProduct)
 }
 
+func UpdateProduct(c *gin.Context) {
+	id := c.Param("id")
+	var product models.Product
+	if err := config.DB.First(&product, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Sản phẩm không tồn tại"})
+		return
+	}
+
+	var updateData models.Product
+	if err := c.ShouldBindJSON(&updateData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	product.Name = updateData.Name
+	product.Price = updateData.Price
+	config.DB.Save(&product)
+
+	c.JSON(http.StatusOK, product)
+}
+
 func DeleteProduct(c *gin.Context) {
 	idStr := c.Param("id")
-	fmt.Println(string(idStr))
-	fmt.Scanf(string(idStr))
-	os.Exit(0)
+	log.Println("Received ID string:", idStr)
+
 	id, err := strconv.Atoi(idStr)
-	log.Printf("%d\n", id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
 		return
