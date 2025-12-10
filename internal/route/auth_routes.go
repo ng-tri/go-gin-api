@@ -1,7 +1,7 @@
 package route
 
 import (
-	"go-gin-api/internal/controller"
+	"go-gin-api/internal/handler"
 	"go-gin-api/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -10,10 +10,10 @@ import (
 func RegisterAuthRoutes(r *gin.Engine) {
 
 	authService := service.NewAuthService()
-	authController := controller.NewAuthController(authService)
+	authHandler := handler.NewAuthHandler(authService)
 
 	auth := r.Group("/auth")
 
-	auth.POST("/login", authController.Login)
-	auth.POST("/verify", authController.VerifyToken)
+	auth.POST("/login", authHandler.Login)
+	auth.POST("/verify", authHandler.VerifyToken)
 }

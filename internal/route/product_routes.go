@@ -1,7 +1,7 @@
 package route
 
 import (
-	"go-gin-api/internal/controller"
+	"go-gin-api/internal/handler"
 	"go-gin-api/internal/middleware"
 	"go-gin-api/internal/service"
 
@@ -10,15 +10,15 @@ import (
 
 func RegisterProductRoutes(r *gin.Engine) {
 	productService := service.NewProductService()
-	productController := controller.NewProductController(productService)
+	productHandler := handler.NewProductHandler(productService)
 
 	products := r.Group("/products")
 	products.Use(middleware.JWTMiddleware())
 	{
-		products.GET("", productController.GetProducts)
-		products.GET("/:id", productController.GetProduct)
-		products.POST("", productController.CreateProduct)
-		products.PUT("/:id", productController.UpdateProduct)
-		products.DELETE("/:id", productController.DeleteProduct)
+		products.GET("", productHandler.GetProducts)
+		products.GET("/:id", productHandler.GetProduct)
+		products.POST("", productHandler.CreateProduct)
+		products.PUT("/:id", productHandler.UpdateProduct)
+		products.DELETE("/:id", productHandler.DeleteProduct)
 	}
 }

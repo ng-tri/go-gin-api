@@ -1,4 +1,4 @@
-package controller
+package handler
 
 import (
 	"net/http"
@@ -10,15 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ProductController struct {
+type ProductHandler struct {
 	svc *service.ProductService
 }
 
-func NewProductController(s *service.ProductService) *ProductController {
-	return &ProductController{svc: s}
+func NewProductHandler(s *service.ProductService) *ProductHandler {
+	return &ProductHandler{svc: s}
 }
 
-func (c *ProductController) GetProducts(ctx *gin.Context) {
+func (c *ProductHandler) GetProducts(ctx *gin.Context) {
 	products, err := c.svc.GetAll()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -27,7 +27,7 @@ func (c *ProductController) GetProducts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, products)
 }
 
-func (c *ProductController) GetProduct(ctx *gin.Context) {
+func (c *ProductHandler) GetProduct(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	product, err := c.svc.GetByID(uint(id))
@@ -39,7 +39,7 @@ func (c *ProductController) GetProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, product)
 }
 
-func (c *ProductController) CreateProduct(ctx *gin.Context) {
+func (c *ProductHandler) CreateProduct(ctx *gin.Context) {
 	var req model.Product
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
@@ -55,7 +55,7 @@ func (c *ProductController) CreateProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, p)
 }
 
-func (c *ProductController) UpdateProduct(ctx *gin.Context) {
+func (c *ProductHandler) UpdateProduct(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	var req model.Product
@@ -73,7 +73,7 @@ func (c *ProductController) UpdateProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, p)
 }
 
-func (c *ProductController) DeleteProduct(ctx *gin.Context) {
+func (c *ProductHandler) DeleteProduct(ctx *gin.Context) {
 	id, _ := strconv.Atoi(ctx.Param("id"))
 
 	err := c.svc.Delete(uint(id))

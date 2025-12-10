@@ -1,4 +1,4 @@
-package controller
+package handler
 
 import (
 	"net/http"
@@ -10,15 +10,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserController struct {
+type UserHandler struct {
 	svc service.UserService
 }
 
-func NewUserController(s service.UserService) *UserController {
-	return &UserController{svc: s}
+func NewUserHandler(s service.UserService) *UserHandler {
+	return &UserHandler{svc: s}
 }
 
-func (c *UserController) GetUsers(ctx *gin.Context) {
+func (c *UserHandler) GetUsers(ctx *gin.Context) {
 	users, err := c.svc.GetAllUser()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Không lấy được danh sách user"})
@@ -30,7 +30,7 @@ func (c *UserController) GetUsers(ctx *gin.Context) {
 	})
 }
 
-func (c *UserController) Register(ctx *gin.Context) {
+func (c *UserHandler) Register(ctx *gin.Context) {
 	var user model.User
 
 	// Lấy JSON từ body
@@ -59,7 +59,7 @@ func (c *UserController) Register(ctx *gin.Context) {
 	})
 }
 
-func (c *UserController) GetUserByID(ctx *gin.Context) {
+func (c *UserHandler) GetUserByID(ctx *gin.Context) {
 	idParam := ctx.Param("id")
 
 	id, err := strconv.Atoi(idParam)
@@ -77,7 +77,7 @@ func (c *UserController) GetUserByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": user})
 }
 
-func (c *UserController) GetUserByEmail(ctx *gin.Context) {
+func (c *UserHandler) GetUserByEmail(ctx *gin.Context) {
 	email := ctx.Param("email")
 
 	user, err := c.svc.GetUserByEmail(email)
@@ -89,7 +89,7 @@ func (c *UserController) GetUserByEmail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": user})
 }
 
-func (c *UserController) GetUserByPhone(ctx *gin.Context) {
+func (c *UserHandler) GetUserByPhone(ctx *gin.Context) {
 	phone := ctx.Param("phone")
 
 	user, err := c.svc.GetUserByPhone(phone)

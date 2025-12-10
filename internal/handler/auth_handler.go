@@ -1,4 +1,4 @@
-package controller
+package handler
 
 import (
 	"net/http"
@@ -8,15 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type AuthController struct {
+type AuthHandler struct {
 	svc service.AuthService
 }
 
-func NewAuthController(s service.AuthService) *AuthController {
-	return &AuthController{svc: s}
+func NewAuthHandler(s service.AuthService) *AuthHandler {
+	return &AuthHandler{svc: s}
 }
 
-func (c *AuthController) Login(ctx *gin.Context) {
+func (c *AuthHandler) Login(ctx *gin.Context) {
 	var req service.LoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
@@ -32,7 +32,7 @@ func (c *AuthController) Login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-func (c *AuthController) VerifyToken(ctx *gin.Context) {
+func (c *AuthHandler) VerifyToken(ctx *gin.Context) {
 	token := ctx.Query("token")
 
 	result, err := c.svc.VerifyToken(token)

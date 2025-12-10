@@ -1,7 +1,7 @@
 package route
 
 import (
-	"go-gin-api/internal/controller"
+	"go-gin-api/internal/handler"
 	"go-gin-api/internal/service"
 
 	"github.com/gin-gonic/gin"
@@ -9,14 +9,14 @@ import (
 
 func RegisterUserRoutes(r *gin.Engine) {
 	userService := service.NewUserService()
-	userController := controller.NewUserController(userService)
+	userHandler := handler.NewUserHandler(userService)
 
 	users := r.Group("/users")
 	{
-		users.GET("/", userController.GetUsers)
-		users.POST("/register", userController.Register)
-		users.GET("/:id", userController.GetUserByID)
-		users.GET("/email/:email", userController.GetUserByEmail)
-		users.GET("/phone/:phone", userController.GetUserByPhone)
+		users.GET("/", userHandler.GetUsers)
+		users.POST("/register", userHandler.Register)
+		users.GET("/:id", userHandler.GetUserByID)
+		users.GET("/email/:email", userHandler.GetUserByEmail)
+		users.GET("/phone/:phone", userHandler.GetUserByPhone)
 	}
 }
