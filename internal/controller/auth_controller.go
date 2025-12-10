@@ -2,41 +2,44 @@ package controller
 
 import (
 	"net/http"
-	"time"
+
+	"go-gin-api/internal/service"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte("secret-key") // 🔐 bí mật (nên lưu .env)
+type AuthController struct {
+	svc service.AuthService
+}
 
-func Login(c *gin.Context) {
-	var user struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
+func NewAuthController(s service.AuthService) *AuthController {
+	return &AuthController{svc: s}
+}
 
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Dữ liệu không hợp lệ"})
+func (c *AuthController) Login(ctx *gin.Context) {
+	var req service.LoginRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request"})
 		return
 	}
 
-	if user.Username != "admin" || user.Password != "123456" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Sai tài khoản hoặc mật khẩu"})
-		return
-	}
-
-	// Tạo JWT token
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Username,
-		"exp":      time.Now().Add(time.Hour * 2).Unix(),
-	})
-
-	tokenString, err := token.SignedString(jwtKey)
+	token, err := c.svc.Login(req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Không tạo được token"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	ctx.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func (c *AuthController) VerifyToken(ctx *gin.Context) {
+	token := ctx.Query("token")
+
+	result, err := c.svc.VerifyToken(token)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, result)
 }
