@@ -1,93 +1,86 @@
 package controller
 
 import (
-	"go-gin-api/internal/database"
-	"go-gin-api/internal/model"
-	"log"
 	"net/http"
 	"strconv"
 
+	"go-gin-api/internal/model"
+	"go-gin-api/internal/service"
+
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
-func GetProducts(c *gin.Context) {
-	var products []model.Product
-	database.DB.Find(&products)
-	c.JSON(http.StatusOK, products)
+type ProductController struct {
+	svc *service.ProductService
 }
 
-func GetProduct(c *gin.Context) {
-	id := c.Param("id")
-	var product model.Product
-	if err := database.DB.First(&product, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Không tìm thấy sản phẩm"})
-		return
-	}
-	c.JSON(http.StatusOK, product)
+func NewProductController(s *service.ProductService) *ProductController {
+	return &ProductController{svc: s}
 }
 
-func CreateProduct(c *gin.Context) {
-	var newProduct model.Product
-	if err := c.ShouldBindJSON(&newProduct); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	if err := database.DB.Create(&newProduct).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot create"})
-		return
-	}
-
-	c.JSON(http.StatusOK, newProduct)
-}
-
-func UpdateProduct(c *gin.Context) {
-	id := c.Param("id")
-	var product model.Product
-	if err := database.DB.First(&product, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Sản phẩm không tồn tại"})
-		return
-	}
-
-	var updateData model.Product
-	if err := c.ShouldBindJSON(&updateData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	product.Name = updateData.Name
-	product.Price = updateData.Price
-	database.DB.Save(&product)
-
-	c.JSON(http.StatusOK, product)
-}
-
-func DeleteProduct(c *gin.Context) {
-	idStr := c.Param("id")
-	log.Println("Received ID string:", idStr)
-
-	id, err := strconv.Atoi(idStr)
+func (c *ProductController) GetProducts(ctx *gin.Context) {
+	products, err := c.svc.GetAll()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, products)
+}
+
+func (c *ProductController) GetProduct(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+
+	product, err := c.svc.GetByID(uint(id))
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return
 	}
 
-	var product model.Product
-	result := database.DB.First(&product, id)
-	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
-		}
+	ctx.JSON(http.StatusOK, product)
+}
+
+func (c *ProductController) CreateProduct(ctx *gin.Context) {
+	var req model.Product
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
 		return
 	}
 
-	if err := database.DB.Delete(&product).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete product"})
+	p, err := c.svc.Create(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
+	ctx.JSON(http.StatusCreated, p)
+}
+
+func (c *ProductController) UpdateProduct(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+
+	var req model.Product
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid data"})
+		return
+	}
+
+	p, err := c.svc.Update(uint(id), &req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, p)
+}
+
+func (c *ProductController) DeleteProduct(ctx *gin.Context) {
+	id, _ := strconv.Atoi(ctx.Param("id"))
+
+	err := c.svc.Delete(uint(id))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "deleted"})
 }

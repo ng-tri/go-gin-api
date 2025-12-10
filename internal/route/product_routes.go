@@ -3,25 +3,22 @@ package route
 import (
 	"go-gin-api/internal/controller"
 	"go-gin-api/internal/middleware"
+	"go-gin-api/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterProductRoutes(r *gin.Engine) {
-	// productGroup := r.Group("/products", middlewares.AuthMiddleware())
-	// productGroup := r.Group("/products")
-	// {
-	// 	productGroup.GET("", controller.GetProducts)
-	// 	productGroup.POST("", controller.CreateProduct)
-	// }
+	productService := service.NewProductService()
+	productController := controller.NewProductController(productService)
 
 	products := r.Group("/products")
 	products.Use(middleware.JWTMiddleware())
 	{
-		products.GET("", controller.GetProducts)
-		products.GET("/:id", controller.GetProduct)
-		products.POST("", controller.CreateProduct)
-		products.PUT("/:id", controller.UpdateProduct)
-		products.DELETE("/:id", controller.DeleteProduct)
+		products.GET("", productController.GetProducts)
+		products.GET("/:id", productController.GetProduct)
+		products.POST("", productController.CreateProduct)
+		products.PUT("/:id", productController.UpdateProduct)
+		products.DELETE("/:id", productController.DeleteProduct)
 	}
 }
