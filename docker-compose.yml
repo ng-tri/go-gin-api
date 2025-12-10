@@ -3,6 +3,7 @@ version: "3.8"
 services:
   mysql:
     image: mysql:8.0
+    container_name: mysql_db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: newpassword
@@ -14,12 +15,14 @@ services:
 
   redis:
     image: redis:latest
-    restart: always
+    container_name: redis_cache
     ports:
       - "6379:6379"
+    restart: always
 
   api:
     build: .
+    container_name: go_api
     ports:
       - "8080:8080"
     depends_on:
@@ -31,7 +34,8 @@ services:
           cpus: '1'
           memory: 512M
     environment:
-      DB_DSN: root:newpassword@tcp(mysql:3306)/go_gin_api?charset=utf8mb4&parseTime=True&loc=Local
+      DB_DSN: "root:newpassword@tcp(mysql:3306)/go_gin_api?charset=utf8mb4&parseTime=True&loc=Local"
+    restart: always
 
 volumes:
   mysql_data:
