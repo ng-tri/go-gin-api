@@ -35,7 +35,7 @@ func main() {
 	route.RegisterProductRoutes(r)
 	route.RegisterUserRoutes(r)
 
-	// RUN SERVER at 8080
-	fmt.Println("API Server running at :8080")
-	r.Run(":8080")
+	// RUN SERVER at 8089
+	fmt.Println("API Server running at :8089")
+	r.Run(":8089")
 }
