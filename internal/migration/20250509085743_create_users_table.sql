@@ -6,7 +6,9 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE,
     phone VARCHAR(20) UNIQUE,
     password TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL
 );
 -- +goose StatementEnd
 

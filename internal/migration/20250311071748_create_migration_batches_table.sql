@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS migration_batches (
     version_id BIGINT NOT NULL,
     batch INT NOT NULL,
     migration VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL
 );
 -- +goose StatementEnd
 
