@@ -16,7 +16,7 @@ func RegisterUserRoutes(r *gin.Engine) {
 		users.GET("/", userHandler.GetUsers)
 		users.POST("/register", userHandler.Register)
 		users.GET("/:id", userHandler.GetUserByID)
-		users.GET("/email/:email", userHandler.GetUserByEmail)
-		users.GET("/phone/:phone", userHandler.GetUserByPhone)
+		users.GET("/email", userHandler.GetUserByEmail)
+		users.GET("/phone", userHandler.GetUserByPhone)
 	}
 }

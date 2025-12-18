@@ -78,7 +78,7 @@ func (c *UserHandler) GetUserByID(ctx *gin.Context) {
 }
 
 func (c *UserHandler) GetUserByEmail(ctx *gin.Context) {
-	email := ctx.Param("email")
+	email := ctx.Query("email")
 
 	user, err := c.svc.GetUserByEmail(email)
 	if err != nil {
@@ -90,7 +90,7 @@ func (c *UserHandler) GetUserByEmail(ctx *gin.Context) {
 }
 
 func (c *UserHandler) GetUserByPhone(ctx *gin.Context) {
-	phone := ctx.Param("phone")
+	phone := ctx.Query("phone")
 
 	user, err := c.svc.GetUserByPhone(phone)
 	if err != nil {
