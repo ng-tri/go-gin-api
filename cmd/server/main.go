@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-
+	"go-gin-api/internal/config"
 	"go-gin-api/internal/database"
 	"go-gin-api/internal/middleware"
-	"go-gin-api/internal/model"
 	"go-gin-api/internal/route"
 
 	"github.com/gin-gonic/gin"
@@ -13,13 +12,16 @@ import (
 
 func main() {
 	// DATABASE INIT
+	config.LoadEnv()
 	database.ConnectDB()
-	database.DB.AutoMigrate(
-		&model.User{},
-		&model.Product{},
-		&model.Order{},
-		&model.OrderItem{},
-	)
+
+	// // AutoMigrate chỉ nên dùng cho demo, project nhỏ hoặc môi trường development
+	// database.DB.AutoMigrate(
+	// 	&model.User{},
+	// 	&model.Product{},
+	// 	&model.Order{},
+	// 	&model.OrderItem{},
+	// )
 
 	// GIN INIT
 	gin.SetMode(gin.ReleaseMode)
@@ -35,7 +37,7 @@ func main() {
 	route.RegisterProductRoutes(r)
 	route.RegisterUserRoutes(r)
 
-	// RUN SERVER at 8089
-	fmt.Println("API Server running at :8089")
-	r.Run(":8089")
+	// RUN SERVER
+	fmt.Println("API Server running at :" + config.Env.AppPort)
+	r.Run(":" + config.Env.AppPort)
 }
